@@ -30,6 +30,17 @@ def get_text_input(message, error_message="invalid input!"):
         print(error_message)
 
 
+def get_int_input(message, error_message="invalid input!"):
+
+    while True:
+        value = input(message).strip()
+
+        if value.isdigit():
+            return int(value)
+        
+        print(error_message)
+    
+
 def get_search_input(message):
 
     return input(message).strip()
@@ -37,7 +48,7 @@ def get_search_input(message):
 
 def get_choice(message):
 
-    valid_choices = [str(i) for i in range(1, 12)]
+    valid_choices = [str(i) for i in range(1, 14)]
 
     while True:
 

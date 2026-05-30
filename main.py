@@ -1,6 +1,9 @@
 from core_logic import SystemManagement
+from database import create_table
 
 import helpers
+
+create_table()
 
 system = SystemManagement()
 
@@ -20,7 +23,9 @@ def main():
         print("8. delete course")
         print("9. enroll student")
         print("10. unenroll student")
-        print("11. exit")
+        print("11. show student's courses")
+        print("12. show course's students")
+        print("13. exit")
 
         choice = helpers.get_choice("choose: ")
 
@@ -35,9 +40,9 @@ def main():
                 "class name: ",
                 "this field is required!"
             )
-            student = system.add_student(name, class_name)
+            success = system.add_student(name, class_name)
 
-            if not student:
+            if not success:
                 print("this student already exists!")
             else:
                 print("student added!")
@@ -65,9 +70,9 @@ def main():
 
         elif choice == "4":
 
-            keyword = helpers.get_search_input("enter student's id or name to delete: ")
+            student_id = helpers.get_int_input("enter student's id to delete: ")
 
-            success = system.delete_student(keyword)
+            success = system.delete_student(student_id)
 
             if success:
                 print("student deleted successfully!")
@@ -85,9 +90,9 @@ def main():
                 "this field is required!"
             )
 
-            course = system.add_course(course_name, teacher_name)
+            success = system.add_course(course_name, teacher_name)
 
-            if not course:
+            if not success:
                 print("this course already exists!")
 
             else:
@@ -119,9 +124,9 @@ def main():
 
         elif choice == "8":
 
-            keyword = helpers.get_search_input("enter course's id/name to delete: ")
+            course_id = helpers.get_int_input("enter course's id to delete: ")
 
-            success = system.delete_course(keyword)
+            success = system.delete_course(course_id)
 
             if success:
                 print("course deleted successfully!")
@@ -130,23 +135,62 @@ def main():
 
         elif choice == "9":
 
-            s_keyword = helpers.get_search_input("student's id/name: ")
-            c_keyword = helpers.get_search_input("course's id/name: ")
+            student_id = helpers.get_int_input("student's id: ")
+            course_id = helpers.get_int_input("course's id: ")
 
-            success = system.enroll_student(s_keyword, c_keyword)
+            success = system.enroll_student(student_id, course_id)
 
             print("enrolled!" if success else "failed!")
 
         elif choice == "10":
 
-            s_keyword = helpers.get_search_input("student's id/name: ")
-            c_keyword = helpers.get_search_input("course's id/name: ")
+            student_id = helpers.get_int_input("student's id: ")
+            course_id = helpers.get_int_input("course's id: ")
 
-            success = system.unenroll_student(s_keyword, c_keyword)
+            success = system.unenroll_student(student_id, course_id)
 
             print("unenrolled!" if success else "failed!")
 
         elif choice == "11":
+            student_id = helpers.get_int_input("enter student's id: ")
+
+            student = system.get_student_by_id(student_id)
+
+            if not student:
+                print("no student found!")
+
+            else:
+                courses = system.get_student_courses(student_id)
+
+                if courses:
+                    print(f"student {student.id} - {student.name} enrolled in:")
+
+                    for course in courses:
+                        print(course)
+
+                else:
+                    print(f"student {student.id} - {student.name} not enrolled any course!")
+
+        elif choice == "12":
+            course_id = helpers.get_int_input("enter course's id: ")
+
+            course = system.get_course_by_id(course_id)
+
+            if not course:
+                print("no course found!")
+
+            else:
+                students = system.get_course_students(course_id)
+
+                if students:
+                    print(f"course {course.id} - {course.name} has:")
+
+                    for student in students:
+                        print(student)
+                else:
+                    print(f"course {course.id} - {course.name} has no enrolled student!")
+
+        elif choice == "13":
             print("exited!")
             break
 

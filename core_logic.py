@@ -1,155 +1,349 @@
 from models import Student, Course
-
-import helpers
+from database import connect_db
 
 
 class SystemManagement:
 
     def __init__(self):
-        self.students = []
-        self.courses = []
-
-        self.next_student_id = 1
-        self.next_course_id = 1
+        pass
 
 
     def add_student(self, name, class_name):
 
-        for student in self.students:
+        connection = connect_db()
+        cursor = connection.cursor()
 
-            if student.name.lower() == name.lower() and student.class_name.lower() == class_name.lower():
-                return None
+        cursor.execute("""
+        SELECT id FROM students
+        WHERE LOWER(name) = LOWER(?) AND LOWER(class_name) = LOWER(?)
+        """, (name, class_name))
 
-        new_student = Student(self.next_student_id, name, class_name)
+        existing_student = cursor.fetchone()
 
-        self.students.append(new_student)
+        if existing_student:
+            connection.close()
+            return False
 
-        self.next_student_id += 1
+        cursor.execute("""
+        INSERT INTO students (name, class_name)
+        VALUES (?, ?)
+        """, (name, class_name))
 
-        return new_student
+        connection.commit()
+        connection.close()
+
+        return True
     
 
     def get_students(self):
 
-        return self.students
+        connection = connect_db()
+        cursor = connection.cursor()
+
+        cursor.execute("""
+        SELECT id, name, class_name FROM students
+        """)
+
+        rows = cursor.fetchall()
+
+        connection.close()
+
+        students = []
+
+        for row in rows:
+            student = Student(row[0], row[1], row[2])
+            students.append(student)
+
+        return students
     
 
-    def search_student(self, keyword: str):
+    def get_student_by_id(self, student_id):
+
+        connection = connect_db()
+        cursor = connection.cursor()
+
+        cursor.execute("""
+        SELECT id, name, class_name FROM students
+        WHERE id = ?
+        """, (student_id,))
+
+        row = cursor.fetchone()
+
+        connection.close()
+
+        if not row:
+            return None
+        
+        return Student(row[0], row[1], row[2])
+    
+
+    def search_student(self, keyword):
+
+        connection = connect_db()
+        cursor = connection.cursor()
 
         if keyword.isdigit():
-            student = helpers.find_by_id(self.students, int(keyword))
+            cursor.execute("""
+            SELECT id, name, class_name FROM students
+            WHERE id = ?
+            """, (int(keyword),))
 
-            return [student] if student else []
-        
-        results = []
+        else:
+            cursor.execute("""
+            SELECT id, name, class_name FROM students
+            WHERE name LIKE ?
+            """, (f"%{keyword}%",))
 
-        for student in self.students:
-            if keyword.lower() in student.name.lower():
-                results.append(student)
+        rows = cursor.fetchall()
 
-        return results
-    
+        connection.close()
 
-    def delete_student(self, keyword: str):
+        students = []
 
-        found_student = helpers.find_item(self.students, keyword)
+        for row in rows:
+            student = Student(row[0], row[1], row[2])
+            students.append(student)
 
-        if not found_student:
-            return False
-        
-        for course in self.courses:
-            if found_student in course.students:
-                course.students.remove(found_student)
-        
-        self.students.remove(found_student)
+        return students
 
-        return True
-    
+
+    def delete_student(self, student_id):
+
+        connection = connect_db()
+        cursor = connection.cursor()
+
+        cursor.execute("""
+        DELETE FROM enrollments
+        WHERE student_id = ?
+        """, (student_id,))
+
+        cursor.execute("""
+        DELETE FROM students
+        WHERE id = ?
+        """, (student_id,))
+
+        connection.commit()
+
+        success = cursor.rowcount > 0
+
+        connection.close()
+
+        return success
+ 
 
     def add_course(self, course_name, teacher):
 
-        for course in self.courses:
+        connection = connect_db()
+        cursor = connection.cursor()
 
-            if course.name.lower() == course_name.lower() and course.teacher.lower() == teacher.lower():
-                return None
+        cursor.execute("""
+        SELECT id FROM courses
+        WHERE LOWER(name) = LOWER(?) AND LOWER(teacher) = LOWER(?)
+        """, (course_name, teacher))
 
-        new_course = Course(self.next_course_id, course_name, teacher)
+        existing_course = cursor.fetchone()
 
-        self.courses.append(new_course)
+        if existing_course:
+            connection.close()
+            return False
 
-        self.next_course_id += 1
+        cursor.execute("""
+        INSERT INTO courses (name, teacher)
+        VALUES (?, ?)
+        """, (course_name, teacher))
 
-        return new_course
-    
+        connection.commit()
+        connection.close()
+
+        return True
+
 
     def get_courses(self):
 
-        return self.courses
+        connection = connect_db()
+        cursor = connection.cursor()
+
+        cursor.execute("""
+        SELECT id, name, teacher FROM courses
+        """)
+
+        rows = cursor.fetchall()
+
+        connection.close()
+
+        courses = []
+
+        for row in rows:
+            course = Course(row[0], row[1], row[2])
+            courses.append(course)
+
+        return courses
     
 
-    def search_course(self, keyword: str):
+    def get_course_by_id(self, course_id):
+
+        connection = connect_db()
+        cursor = connection.cursor()
+
+        cursor.execute("""
+        SELECT id, name, teacher FROM courses
+        WHERE id = ?
+        """, (course_id,))
+
+        row = cursor.fetchone()
+
+        connection.close()
+
+        if not row:
+            return None
+        
+        return Course(row[0], row[1], row[2])
+
+    
+    def search_course(self, keyword):
+
+        connection = connect_db()
+        cursor = connection.cursor()
 
         if keyword.isdigit():
-            course = helpers.find_by_id(self.courses, int(keyword))
+            cursor.execute("""
+            SELECT id, name, teacher FROM courses
+            WHERE id = ?
+            """, (int(keyword),))
 
-            return [course] if course else []
+        else:
+            cursor.execute("""
+            SELECT id, name, teacher FROM courses
+            WHERE name LIKE ?
+            """, (f"%{keyword}%",))
 
-        results = []
+        rows = cursor.fetchall()
 
-        for course in self.courses:
-            if keyword.lower() in course.name.lower():
-                results.append(course)
+        connection.close()
 
-        return results
+        courses = []
+
+        for row in rows:
+            course = Course(row[0], row[1], row[2])
+            courses.append(course)
+
+        return courses
+
+
+    def delete_course(self, course_id):
+
+        connection = connect_db()
+        cursor = connection.cursor()
+
+        cursor.execute("""
+        DELETE FROM enrollments
+        WHERE course_id = ?
+        """, (course_id,))
+
+        cursor.execute("""
+        DELETE FROM courses
+        WHERE id = ?
+        """, (course_id,))
+
+        connection.commit()
+
+        success = cursor.rowcount > 0
+
+        connection.close()
+
+        return success
+
+
+    def enroll_student(self, student_id, course_id):
+
+        connection = connect_db()
+        cursor = connection.cursor()
+
+        try:
+
+            cursor.execute("""
+            INSERT INTO enrollments (student_id, course_id)
+            values (?, ?)
+            """, (student_id, course_id))
+
+            connection.commit()
+
+            return True
+        
+        except:
+            return False
+        
+        finally:
+            connection.close()
     
 
-    def delete_course(self, keyword: str):
+    def unenroll_student(self, student_id, course_id):
 
-        found_course = helpers.find_item(self.courses, keyword)
+        connection = connect_db()
+        cursor = connection.cursor()
 
-        if not found_course:
-            return False
-        
-        for student in self.students:
-            if found_course in student.courses:
-                student.courses.remove(found_course)
+        cursor.execute("""
+        DELETE FROM enrollments
+        WHERE student_id = ? AND course_id = ?
+        """, (student_id, course_id))
 
-        self.courses.remove(found_course)
+        connection.commit()
 
-        return True
+        success = cursor.rowcount > 0
+
+        connection.close()
+
+        return success
     
 
-    def enroll_student(self, student_keyword: str, course_keyword: str):
+    def get_student_courses(self, student_id):
 
-        student = helpers.find_item(self.students, student_keyword)
+        connection = connect_db()
+        cursor = connection.cursor()
 
-        course = helpers.find_item(self.courses, course_keyword)
+        cursor.execute("""
+        SELECT courses.id, courses.name, courses.teacher
+        FROM courses
+        JOIN enrollments
+        ON courses.id = enrollments.course_id
+        WHERE enrollments.student_id = ?
+        """, (student_id,))
 
-        if not student or not course:
-            return False
-        
-        if course in student.courses:
-            return False
-        
-        student.courses.append(course)
-        course.students.append(student)
+        rows = cursor.fetchall()
 
-        return True
+        connection.close()
+
+        courses = []
+
+        for row in rows:
+            course = Course(row[0], row[1], row[2])
+            courses.append(course)
+
+        return courses
     
 
-    def unenroll_student(self, student_keyword: str, course_keyword: str):
+    def get_course_students(self, course_id):
 
-        student = helpers.find_item(self.students, student_keyword)
-        course = helpers.find_item(self.courses, course_keyword)
+        connection = connect_db()
+        cursor = connection.cursor()
 
-        if not student or not course:
-            return False
-        
-        if course not in student.courses:
-            return False
-        
-        student.courses.remove(course)
-        course.students.remove(student)
+        cursor.execute("""
+        SELECT students.id, students.name, students.class_name
+        FROM students
+        JOIN enrollments
+        ON students.id = enrollments.student_id
+        WHERE enrollments.course_id = ?
+        """, (course_id,))
 
-        return True
+        rows = cursor.fetchall()
+
+        connection.close()
+
+        students = []
+
+        for row in rows:
+            student = Student(row[0], row[1], row[2])
+            students.append(student)
+
+        return students
     
