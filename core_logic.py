@@ -77,6 +77,37 @@ class SystemManagement:
         return Student(row[0], row[1], row[2])
     
 
+    def update_student(self, student_id, name, class_name):
+
+        connection = connect_db()
+        cursor = connection.cursor()
+
+        cursor.execute("""
+        SELECT id FROM students
+        WHERE LOWER(name) = LOWER(?) AND LOWER(class_name) = LOWER(?) AND id != ?
+        """, (name, class_name, student_id))
+
+        existing_student = cursor.fetchone()
+
+        if existing_student:
+            connection.close()
+            return False
+
+        cursor.execute("""
+        UPDATE students
+        SET name = ?, class_name = ?
+        WHERE id = ?
+        """, (name, class_name, student_id))
+
+        connection.commit()
+
+        success = cursor.rowcount > 0
+
+        connection.close()
+
+        return success
+    
+
     def search_student(self, keyword):
 
         connection = connect_db()
@@ -198,6 +229,37 @@ class SystemManagement:
             return None
         
         return Course(row[0], row[1], row[2])
+    
+
+    def update_course(self, course_id, name, teacher):
+
+        connection = connect_db()
+        cursor = connection.cursor()
+
+        cursor.execute("""
+        SELECT id FROM courses
+        WHERE LOWER(name) = LOWER(?) AND LOWER(teacher) = LOWER(?) AND id != ?
+        """, (name, teacher, course_id))
+
+        existing_course = cursor.fetchone()
+
+        if existing_course:
+            connection.close()
+            return False
+        
+        cursor.execute("""
+        UPDATE courses
+        SET name = ?, teacher = ?
+        WHERE id = ?
+        """, (name, teacher, course_id))
+
+        connection.commit()
+
+        success = cursor.rowcount > 0
+
+        connection.close()
+
+        return success
 
     
     def search_course(self, keyword):

@@ -15,17 +15,19 @@ def main():
         print("\n=== student management system ===")
         print("1. add student")
         print("2. show students")
-        print("3. search student")
-        print("4. delete student")
-        print("5. add course")
-        print("6. show courses")
-        print("7. search course")
-        print("8. delete course")
-        print("9. enroll student")
-        print("10. unenroll student")
-        print("11. show student's courses")
-        print("12. show course's students")
-        print("13. exit")
+        print("3. update student")
+        print("4. search student")
+        print("5. delete student")
+        print("6. add course")
+        print("7. show courses")
+        print("8. update course")
+        print("9. search course")
+        print("10. delete course")
+        print("11. enroll student")
+        print("12. unenroll student")
+        print("13. show student's courses")
+        print("14. show course's students")
+        print("15. exit")
 
         choice = helpers.get_choice("choose: ")
 
@@ -57,6 +59,19 @@ def main():
                 print("no student found!")
 
         elif choice == "3":
+            student_id = helpers.get_int_input("student's id: ")
+            name = helpers.get_text_input("new name: ")
+            class_name = helpers.get_text_input("new class name: ")
+
+            success = system.update_student(student_id, name, class_name)
+
+            if success:
+                print("student's information updated successfully!")
+
+            else:
+                print("update failed!")
+
+        elif choice == "4":
             keyword = helpers.get_search_input("search: ")
 
             result = system.search_student(keyword)
@@ -68,7 +83,7 @@ def main():
             else:
                 print("no student found!")
 
-        elif choice == "4":
+        elif choice == "5":
 
             student_id = helpers.get_int_input("enter student's id to delete: ")
 
@@ -79,7 +94,7 @@ def main():
             else:
                 print("no student found!")
 
-        elif choice == "5":
+        elif choice == "6":
             course_name = helpers.get_text_input(
                 "course's name: ",
                 "this field is required!"
@@ -98,7 +113,7 @@ def main():
             else:
                 print("course added successfully!")
 
-        elif choice == "6":
+        elif choice == "7":
 
             courses = system.get_courses()
 
@@ -108,8 +123,20 @@ def main():
             else:
                 print("no course found!")
 
-        elif choice == "7":
+        elif choice == "8":
+            course_id = helpers.get_int_input("course's id: ")
+            name = helpers.get_text_input("new name: ")
+            teacher = helpers.get_text_input("new teacher's name: ")
 
+            success = system.update_course(course_id, name, teacher)
+
+            if success:
+                print("course's information updated successfully!")
+            
+            else:
+                print("update failed!")
+
+        elif choice == "9":
             keyword = helpers.get_search_input("search: ")
 
             result = system.search_course(keyword)
@@ -122,8 +149,7 @@ def main():
             else:
                 print("no course found!")
 
-        elif choice == "8":
-
+        elif choice == "10":
             course_id = helpers.get_int_input("enter course's id to delete: ")
 
             success = system.delete_course(course_id)
@@ -133,8 +159,7 @@ def main():
             else:
                 print("no course found!")
 
-        elif choice == "9":
-
+        elif choice == "11":
             student_id = helpers.get_int_input("student's id: ")
             course_id = helpers.get_int_input("course's id: ")
 
@@ -142,8 +167,7 @@ def main():
 
             print("enrolled!" if success else "failed!")
 
-        elif choice == "10":
-
+        elif choice == "12":
             student_id = helpers.get_int_input("student's id: ")
             course_id = helpers.get_int_input("course's id: ")
 
@@ -151,7 +175,7 @@ def main():
 
             print("unenrolled!" if success else "failed!")
 
-        elif choice == "11":
+        elif choice == "13":
             student_id = helpers.get_int_input("enter student's id: ")
 
             student = system.get_student_by_id(student_id)
@@ -171,7 +195,7 @@ def main():
                 else:
                     print(f"student {student.id} - {student.name} not enrolled any course!")
 
-        elif choice == "12":
+        elif choice == "14":
             course_id = helpers.get_int_input("enter course's id: ")
 
             course = system.get_course_by_id(course_id)
@@ -190,7 +214,7 @@ def main():
                 else:
                     print(f"course {course.id} - {course.name} has no enrolled student!")
 
-        elif choice == "13":
+        elif choice == "15":
             print("exited!")
             break
 

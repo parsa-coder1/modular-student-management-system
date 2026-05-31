@@ -48,7 +48,7 @@ def get_search_input(message):
 
 def get_choice(message):
 
-    valid_choices = [str(i) for i in range(1, 14)]
+    valid_choices = [str(i) for i in range(1, 16)]
 
     while True:
 
