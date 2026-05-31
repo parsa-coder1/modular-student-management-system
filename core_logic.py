@@ -84,6 +84,28 @@ class SystemManagement:
 
         cursor.execute("""
         SELECT id FROM students
+        WHERE id = ?
+        """, (student_id,))
+
+        student = cursor.fetchone()
+
+        if not student:
+            connection.close()
+            return "not_found"
+        
+        cursor.execute("""
+        SELECT name, class_name FROM students
+        WHERE id = ?
+        """, (student_id,))
+
+        row = cursor.fetchone()
+
+        if row[0].lower() == name.lower() and row[1].lower() == class_name.lower():
+            connection.close()
+            return "no_change"
+
+        cursor.execute("""
+        SELECT id FROM students
         WHERE LOWER(name) = LOWER(?) AND LOWER(class_name) = LOWER(?) AND id != ?
         """, (name, class_name, student_id))
 
@@ -91,7 +113,7 @@ class SystemManagement:
 
         if existing_student:
             connection.close()
-            return False
+            return "exists"
 
         cursor.execute("""
         UPDATE students
@@ -238,6 +260,28 @@ class SystemManagement:
 
         cursor.execute("""
         SELECT id FROM courses
+        WHERE id = ?
+        """, (course_id,))
+
+        course = cursor.fetchone()
+
+        if not course:
+            connection.close()
+            return "not_found"
+        
+        cursor.execute("""
+        SELECT name, teacher FROM courses
+        WHERE id = ?
+        """, (course_id,))
+
+        row = cursor.fetchone()
+
+        if row[0].lower() == name.lower() and row[1].lower() == teacher.lower():
+            connection.close()
+            return "no_change"
+
+        cursor.execute("""
+        SELECT id FROM courses
         WHERE LOWER(name) = LOWER(?) AND LOWER(teacher) = LOWER(?) AND id != ?
         """, (name, teacher, course_id))
 
@@ -245,7 +289,7 @@ class SystemManagement:
 
         if existing_course:
             connection.close()
-            return False
+            return "exists"
         
         cursor.execute("""
         UPDATE courses

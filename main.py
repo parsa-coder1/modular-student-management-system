@@ -65,11 +65,17 @@ def main():
 
             success = system.update_student(student_id, name, class_name)
 
-            if success:
+            if success is True:
                 print("student's information updated successfully!")
 
-            else:
-                print("update failed!")
+            elif success == "exists":
+                print("this student already exists!")
+
+            elif success == "not_found":
+                print("no student found!")
+
+            elif success == "no_change":
+                print("no changes detected!")
 
         elif choice == "4":
             keyword = helpers.get_search_input("search: ")
@@ -130,11 +136,17 @@ def main():
 
             success = system.update_course(course_id, name, teacher)
 
-            if success:
+            if success is True:
                 print("course's information updated successfully!")
             
-            else:
-                print("update failed!")
+            elif success == "exists":
+                print("this course already exists!")
+
+            elif success == "not_found":
+                print("no course found!")
+
+            elif success == "no_change":
+                print("no changes detected!")
 
         elif choice == "9":
             keyword = helpers.get_search_input("search: ")
