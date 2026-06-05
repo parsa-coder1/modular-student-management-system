@@ -1,6 +1,5 @@
 from core_logic import SystemManagement
 from database import create_table
-
 import helpers
 
 create_table()
@@ -175,17 +174,37 @@ def main():
             student_id = helpers.get_int_input("student's id: ")
             course_id = helpers.get_int_input("course's id: ")
 
-            success = system.enroll_student(student_id, course_id)
+            result = system.enroll_student(student_id, course_id)
 
-            print("enrolled!" if success else "failed!")
+            if result == "student_not_found":
+                print("no student found!")
+
+            elif result == "course_not_found":
+                print("no course found!")
+
+            elif result == "already_enrolled":
+                print("this student already enrolled!")
+
+            else:
+                print("student enrolled successfully!")
 
         elif choice == "12":
             student_id = helpers.get_int_input("student's id: ")
             course_id = helpers.get_int_input("course's id: ")
 
-            success = system.unenroll_student(student_id, course_id)
+            result = system.unenroll_student(student_id, course_id)
 
-            print("unenrolled!" if success else "failed!")
+            if result == "student_not_found":
+                print("no student found!")
+
+            elif result == "course_not_found":
+                print("no course found!")
+
+            elif result == "not_enrolled":
+                print("this student not enrolled befor!")
+
+            else:
+                print("student unenrolled successfully!")
 
         elif choice == "13":
             student_id = helpers.get_int_input("enter student's id: ")
@@ -233,4 +252,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
     

@@ -1,3 +1,4 @@
+import sqlite3
 from models import Student, Course
 from database import connect_db
 
@@ -368,6 +369,30 @@ class SystemManagement:
         try:
 
             cursor.execute("""
+            SELECT id FROM students
+            WHERE id = ?
+            """, (student_id,))
+
+            if not cursor.fetchone():
+                return "student_not_found"
+            
+            cursor.execute("""
+            SELECT id FROM courses
+            WHERE id = ?
+            """, (course_id,))
+
+            if not cursor.fetchone():
+                return "course_not_found"
+            
+            cursor.execute("""
+            SELECT student_id, course_id FROM enrollments
+            WHERE student_id = ? AND course_id = ?
+            """, (student_id, course_id))
+
+            if cursor.fetchone():
+                return "already_enrolled"
+
+            cursor.execute("""
             INSERT INTO enrollments (student_id, course_id)
             values (?, ?)
             """, (student_id, course_id))
@@ -376,8 +401,8 @@ class SystemManagement:
 
             return True
         
-        except:
-            return False
+        except sqlite3.IntegrityError:
+            return "already_enrolled"
         
         finally:
             connection.close()
@@ -389,17 +414,47 @@ class SystemManagement:
         cursor = connection.cursor()
 
         cursor.execute("""
+        SELECT id FROM students
+        WHERE id = ?
+        """, (student_id,))
+
+        student = cursor.fetchone()
+
+        if not student:
+            connection.close()
+            return "student_not_found"
+        
+        cursor.execute("""
+        SELECT id FROM courses
+        WHERE id = ?
+        """, (course_id,))
+
+        course = cursor.fetchone()
+
+        if not course:
+            connection.close()
+            return "course_not_found"
+        
+        cursor.execute("""
+        SELECT student_id, course_id FROM enrollments
+        WHERE student_id = ? AND course_id = ?
+        """, (student_id, course_id))
+
+        exist = cursor.fetchone()
+
+        if not exist:
+            connection.close()
+            return "not_enrolled"
+
+        cursor.execute("""
         DELETE FROM enrollments
         WHERE student_id = ? AND course_id = ?
         """, (student_id, course_id))
 
         connection.commit()
-
-        success = cursor.rowcount > 0
-
         connection.close()
 
-        return success
+        return True
     
 
     def get_student_courses(self, student_id):
@@ -452,4 +507,4 @@ class SystemManagement:
             students.append(student)
 
         return students
-    
+        
