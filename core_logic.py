@@ -83,25 +83,13 @@ class SystemManagement:
         connection = connect_db()
         cursor = connection.cursor()
 
-        cursor.execute("""
-        SELECT id FROM students
-        WHERE id = ?
-        """, (student_id,))
-
-        student = cursor.fetchone()
+        student = self.get_student_by_id(student_id)
 
         if not student:
             connection.close()
             return "not_found"
         
-        cursor.execute("""
-        SELECT name, class_name FROM students
-        WHERE id = ?
-        """, (student_id,))
-
-        row = cursor.fetchone()
-
-        if row[0].lower() == name.lower() and row[1].lower() == class_name.lower():
+        if student.name.lower() == name.lower() and student.class_name.lower() == class_name.lower():
             connection.close()
             return "no_change"
 
@@ -259,28 +247,16 @@ class SystemManagement:
         connection = connect_db()
         cursor = connection.cursor()
 
-        cursor.execute("""
-        SELECT id FROM courses
-        WHERE id = ?
-        """, (course_id,))
-
-        course = cursor.fetchone()
+        course = self.get_course_by_id(course_id)
 
         if not course:
             connection.close()
             return "not_found"
         
-        cursor.execute("""
-        SELECT name, teacher FROM courses
-        WHERE id = ?
-        """, (course_id,))
-
-        row = cursor.fetchone()
-
-        if row[0].lower() == name.lower() and row[1].lower() == teacher.lower():
+        if course.name.lower() == name.lower() and course.teacher.lower() == teacher.lower():
             connection.close()
             return "no_change"
-
+        
         cursor.execute("""
         SELECT id FROM courses
         WHERE LOWER(name) = LOWER(?) AND LOWER(teacher) = LOWER(?) AND id != ?
