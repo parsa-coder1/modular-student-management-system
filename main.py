@@ -1,5 +1,6 @@
 from core_logic import SystemManagement
 from database import create_table
+from messages import MESSAGES
 import helpers
 
 create_table()
@@ -44,9 +45,9 @@ def main():
             success = system.add_student(name, class_name)
 
             if not success:
-                print("this student already exists!")
+                print(MESSAGES["student_exists"])
             else:
-                print("student added!")
+                print(MESSAGES["student_added"])
 
         elif choice == "2":
             students = system.get_students()
@@ -55,7 +56,7 @@ def main():
                 for student in students:
                     print(student)
             else:
-                print("no student found!")
+                print(MESSAGES["student_not_found"])
 
         elif choice == "3":
             student_id = helpers.get_int_input("student's id: ")
@@ -65,16 +66,16 @@ def main():
             success = system.update_student(student_id, name, class_name)
 
             if success is True:
-                print("student's information updated successfully!")
+                print(MESSAGES["student_updated"])
 
             elif success == "exists":
-                print("this student already exists!")
+                print(MESSAGES["student_exists"])
 
             elif success == "not_found":
-                print("no student found!")
+                print(MESSAGES["student_not_found"])
 
             elif success == "no_change":
-                print("no changes detected!")
+                print(MESSAGES["no_change"])
 
         elif choice == "4":
             keyword = helpers.get_search_input("search: ")
@@ -86,7 +87,7 @@ def main():
                 for item in result:
                     print(item)
             else:
-                print("no student found!")
+                print(MESSAGES["student_not_found"])
 
         elif choice == "5":
 
@@ -95,9 +96,9 @@ def main():
             success = system.delete_student(student_id)
 
             if success:
-                print("student deleted successfully!")
+                print(MESSAGES["student_deleted"])
             else:
-                print("no student found!")
+                print(MESSAGES["student_not_found"])
 
         elif choice == "6":
             course_name = helpers.get_text_input(
@@ -113,10 +114,10 @@ def main():
             success = system.add_course(course_name, teacher_name)
 
             if not success:
-                print("this course already exists!")
+                print(MESSAGES["course_exists"])
 
             else:
-                print("course added successfully!")
+                print(MESSAGES["course_added"])
 
         elif choice == "7":
 
@@ -126,7 +127,7 @@ def main():
                 for course in courses:
                     print(course)
             else:
-                print("no course found!")
+                print(MESSAGES["course_not_found"])
 
         elif choice == "8":
             course_id = helpers.get_int_input("course's id: ")
@@ -136,16 +137,16 @@ def main():
             success = system.update_course(course_id, name, teacher)
 
             if success is True:
-                print("course's information updated successfully!")
+                print(MESSAGES["course_updated"])
             
             elif success == "exists":
-                print("this course already exists!")
+                print(MESSAGES["course_exists"])
 
             elif success == "not_found":
-                print("no course found!")
+                print(MESSAGES["course_not_found"])
 
             elif success == "no_change":
-                print("no changes detected!")
+                print(MESSAGES["no_change"])
 
         elif choice == "9":
             keyword = helpers.get_search_input("search: ")
@@ -158,7 +159,7 @@ def main():
                     print(item)
 
             else:
-                print("no course found!")
+                print(MESSAGES["course_not_found"])
 
         elif choice == "10":
             course_id = helpers.get_int_input("enter course's id to delete: ")
@@ -166,9 +167,9 @@ def main():
             success = system.delete_course(course_id)
 
             if success:
-                print("course deleted successfully!")
+                print(MESSAGES["course_deleted"])
             else:
-                print("no course found!")
+                print(MESSAGES["course_not_found"])
 
         elif choice == "11":
             student_id = helpers.get_int_input("student's id: ")
@@ -177,16 +178,16 @@ def main():
             result = system.enroll_student(student_id, course_id)
 
             if result == "student_not_found":
-                print("no student found!")
+                print(MESSAGES["student_not_found"])
 
             elif result == "course_not_found":
-                print("no course found!")
+                print(MESSAGES["course_not_found"])
 
             elif result == "already_enrolled":
-                print("this student already enrolled!")
+                print(MESSAGES["student_already_enrolled"])
 
             else:
-                print("student enrolled successfully!")
+                print(MESSAGES["student_enrolled"])
 
         elif choice == "12":
             student_id = helpers.get_int_input("student's id: ")
@@ -195,16 +196,16 @@ def main():
             result = system.unenroll_student(student_id, course_id)
 
             if result == "student_not_found":
-                print("no student found!")
+                print(MESSAGES["student_not_found"])
 
             elif result == "course_not_found":
-                print("no course found!")
+                print(MESSAGES["course_not_found"])
 
             elif result == "not_enrolled":
-                print("this student not enrolled befor!")
+                print(MESSAGES["student_not_enrolled"])
 
             else:
-                print("student unenrolled successfully!")
+                print(MESSAGES["student_unenrolled"])
 
         elif choice == "13":
             student_id = helpers.get_int_input("enter student's id: ")
@@ -212,7 +213,7 @@ def main():
             student = system.get_student_by_id(student_id)
 
             if not student:
-                print("no student found!")
+                print(MESSAGES["student_not_found"])
 
             else:
                 courses = system.get_student_courses(student_id)
@@ -232,7 +233,7 @@ def main():
             course = system.get_course_by_id(course_id)
 
             if not course:
-                print("no course found!")
+                print(MESSAGES["course_not_found"])
 
             else:
                 students = system.get_course_students(course_id)
